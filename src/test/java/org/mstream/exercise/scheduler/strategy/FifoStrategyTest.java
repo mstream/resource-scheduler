@@ -53,4 +53,19 @@ public class FifoStrategyTest {
 		assertTrue( instance.isQueueEmpty( ) );
 	}
 
+	@Test
+	public void shouldCancelGroupOfMessages( ) throws Exception {
+		List<Message<String>> messages = Arrays.asList(
+				mockMessage( "message1", "group2" ),
+				mockMessage( "message2", "group1" ),
+				mockMessage( "message3", "group2" ),
+				mockMessage( "message4", "group3" )
+		);
+		messages.stream( ).forEachOrdered( instance::enqueue );
+		instance.cancel( "group2" );
+		assertEquals( instance.dequeue( ).getId( ), messages.get( 1 ).getId( ) );
+		assertEquals( instance.dequeue( ).getId( ), messages.get( 3 ).getId( ) );
+		assertTrue( instance.isQueueEmpty() );
+	}
+
 }

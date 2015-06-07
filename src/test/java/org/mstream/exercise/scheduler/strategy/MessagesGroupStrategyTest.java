@@ -8,9 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.mstream.exercise.scheduler.mocks.MessageFixture.*;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 
 public class MessagesGroupStrategyTest {
@@ -54,5 +52,21 @@ public class MessagesGroupStrategyTest {
 		instance.dequeue();
 		assertTrue( instance.isQueueEmpty( ) );
 	}
+
+	@Test
+	public void shouldCancelGroupOfMessages( ) throws Exception {
+		List<Message<String>> messages = Arrays.asList(
+				mockMessage( "message1", "group2" ),
+				mockMessage( "message2", "group1" ),
+				mockMessage( "message3", "group2" ),
+				mockMessage( "message4", "group3" )
+		);
+		messages.stream( ).forEachOrdered( instance::enqueue );
+		instance.cancel( "group2" );
+		assertEquals( instance.dequeue( ).getId( ), messages.get( 1 ).getId( ) );
+		assertEquals( instance.dequeue( ).getId( ), messages.get( 3 ).getId( ) );
+		assertTrue( instance.isQueueEmpty() );
+	}
+
 
 }

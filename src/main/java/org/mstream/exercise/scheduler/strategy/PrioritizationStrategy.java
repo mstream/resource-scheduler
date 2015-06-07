@@ -11,4 +11,6 @@ public interface PrioritizationStrategy {
 
 	boolean isQueueEmpty( );
 
+	void cancel( Object groupId );
+
 }

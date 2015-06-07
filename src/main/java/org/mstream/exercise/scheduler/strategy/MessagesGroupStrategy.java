@@ -3,6 +3,7 @@ package org.mstream.exercise.scheduler.strategy;
 import org.mstream.exercise.scheduler.resource.Message;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class MessagesGroupStrategy implements PrioritizationStrategy {
@@ -31,6 +32,18 @@ public class MessagesGroupStrategy implements PrioritizationStrategy {
 
 	@Override public boolean isQueueEmpty( ) {
 		return messageQueue.isEmpty( );
+	}
+
+	@Override public void cancel( Object groupId ) {
+		if ( messageQueue == null || messageQueue.isEmpty( ) ) {
+			return;
+		}
+		Queue<Message> newMessageQueue = new PriorityQueue<>( comparator );
+		newMessageQueue.addAll( messageQueue.stream( )
+						.filter( msg -> !groupId.equals( msg.getGroupId( ) ) )
+						.collect( Collectors.toList( ) )
+		);
+		messageQueue = newMessageQueue;
 	}
 
 	private void rebuildQueue( ) {
