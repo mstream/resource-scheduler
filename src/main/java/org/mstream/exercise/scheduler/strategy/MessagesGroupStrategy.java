@@ -29,6 +29,10 @@ public class MessagesGroupStrategy implements PrioritizationStrategy {
 		return messageQueue.poll( );
 	}
 
+	@Override public boolean isQueueEmpty( ) {
+		return messageQueue.isEmpty();
+	}
+
 	private void rebuildQueue( ) {
 		Queue<Message> newMessageQueue = new PriorityQueue<>( comparator );
 		if ( messageQueue != null ) {

@@ -7,4 +7,6 @@ public interface PrioritizationStrategy {
 
 	void enqueue( Message<?> message );
 	Message dequeue();
+	boolean isQueueEmpty( );
+
 }
