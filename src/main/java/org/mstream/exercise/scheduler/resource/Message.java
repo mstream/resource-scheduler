@@ -6,4 +6,6 @@ public interface Message<ID> {
 	ID getGroupId( );
 
 	void completed( );
+
+	boolean isTerminating( );
 }

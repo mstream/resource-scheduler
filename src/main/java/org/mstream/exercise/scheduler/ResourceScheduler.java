@@ -4,20 +4,26 @@ import org.mstream.exercise.scheduler.resource.Gateway;
 import org.mstream.exercise.scheduler.resource.Message;
 import org.mstream.exercise.scheduler.strategy.PrioritizationStrategy;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 public class ResourceScheduler {
 
 	private final Gateway gateway;
 	private final PrioritizationStrategy prioritizationStrategy;
+	private final Set terminatedGroups;
 	private int availableResources;
 
 	public ResourceScheduler( Gateway gateway, int resourcesNumber, PrioritizationStrategy prioritizationStrategy ) {
 		this.gateway = gateway;
-		this.availableResources = resourcesNumber;
 		this.prioritizationStrategy = prioritizationStrategy;
+		this.terminatedGroups = new HashSet<>( );
+		this.availableResources = resourcesNumber;
 	}
 
 	public void schedule( Message<?> message ) {
+		checkTermination( message );
 		Message wrappedMessage = new MessageWrapper<>( message );
 		prioritizationStrategy.enqueue( wrappedMessage );
 		if ( availableResources > 0 ) {
@@ -26,12 +32,21 @@ public class ResourceScheduler {
 		}
 	}
 
+	private void checkTermination( Message<?> message ) {
+		if ( terminatedGroups.contains( message.getGroupId( ) ) ) {
+			throw new IllegalStateException( "can't schedule message from terminated group: " + message.getId( ) );
+		}
+		if ( message.isTerminating( ) ) {
+			terminatedGroups.add( message.getGroupId( ) );
+		}
+	}
+
 	private void sendNextToGateway( ) {
-		assert anyPandingMessages( );
+		assert anyPendingMessages( );
 		gateway.send( prioritizationStrategy.dequeue( ) );
 	}
 
-	private boolean anyPandingMessages( ) {
+	private boolean anyPendingMessages( ) {
 		return !prioritizationStrategy.isQueueEmpty( );
 	}
 
@@ -53,10 +68,14 @@ public class ResourceScheduler {
 
 		@Override public void completed( ) {
 			ResourceScheduler.this.availableResources++;
-			if ( anyPandingMessages( ) ) {
+			if ( anyPendingMessages( ) ) {
 				sendNextToGateway( );
 			}
 			delegate.completed( );
+		}
+
+		@Override public boolean isTerminating( ) {
+			return delegate.isTerminating( );
 		}
 	}
 

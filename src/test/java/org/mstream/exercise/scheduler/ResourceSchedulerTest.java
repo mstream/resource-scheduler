@@ -80,7 +80,21 @@ public class ResourceSchedulerTest {
 			fail( "scheduler sent too many messages to gateway" );
 		}
 		gatewayMock.finishProcessing();
-		assertEquals( gatewayMock.getProcessingMessages().size(), 1 );
+		assertEquals( gatewayMock.getProcessingMessages( ).size( ), 1 );
 		assertEquals( gatewayMock.getProcessingMessages().get( 0 ).getId(), messageB.getId() );
+	}
+
+	@Test(expectedExceptions = {IllegalStateException.class})
+	public void shouldThrowExceptionWhenMessageFromTerminatedGroupSent( ) throws Exception {
+		GatewayMock gatewayMock = new GatewayMock( 1 );
+		instance = new ResourceScheduler( gatewayMock, gatewayMock.getResourcesNumber(), new FifoStrategy() );
+		Message<String> terminatingMessage = mockTerminatingMessage( "msgA", "grp" );
+		Message<String> message = mockMessage( "msgB", "grp" );
+		try {
+			instance.schedule( terminatingMessage );
+			instance.schedule( message );
+		} catch ( NotEnoughOfAvailableResourcesException e ) {
+			fail( "scheduler sent too many messages to gateway" );
+		}
 	}
 }

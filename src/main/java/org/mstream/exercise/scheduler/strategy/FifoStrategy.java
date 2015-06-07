@@ -15,10 +15,10 @@ public class FifoStrategy implements PrioritizationStrategy {
 	}
 
 	@Override public Message dequeue( ) {
-		return messageQueue.poll();
+		return messageQueue.poll( );
 	}
 
 	@Override public boolean isQueueEmpty( ) {
-		return messageQueue.isEmpty();
+		return messageQueue.isEmpty( );
 	}
 }
