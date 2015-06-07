@@ -6,18 +6,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class MessagesGroupStrategy implements PrioritizationStrategy {
+public class MessagesGroupsPriorityQueue implements QueuePrioritizationStrategy {
 
 	private List groupsOrder = new ArrayList( );
 	private Queue<Message> messageQueue;
 	private Comparator<Message> comparator = ( m1, m2 ) ->
 			Integer.compare( groupsOrder.indexOf( m1.getGroupId( ) ), groupsOrder.indexOf( m2.getGroupId( ) ) );
 
-	public MessagesGroupStrategy( ) {
+	public MessagesGroupsPriorityQueue( ) {
 		rebuildQueue( );
 	}
 
-	@Override public void enqueue( Message<?> message ) {
+	@Override public void enqueue( Message message ) {
 		Object groupId = message.getGroupId( );
 		if ( !groupsOrder.contains( groupId ) ) {
 			groupsOrder.add( groupId );
@@ -26,7 +26,7 @@ public class MessagesGroupStrategy implements PrioritizationStrategy {
 		messageQueue.offer( message );
 	}
 
-	@Override public Message<?> dequeue( ) {
+	@Override public Message dequeue( ) {
 		return messageQueue.poll( );
 	}
 

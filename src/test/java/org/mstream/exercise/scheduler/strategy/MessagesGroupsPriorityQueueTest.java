@@ -7,17 +7,17 @@ import org.testng.annotations.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mstream.exercise.scheduler.mocks.MessageFixture.mockMessage;
+import static org.mstream.exercise.scheduler.mocks.MessageFixture.*;
 import static org.testng.Assert.*;
 
 
-public class FifoStrategyTest {
+public class MessagesGroupsPriorityQueueTest {
 
-	private FifoStrategy instance;
+	private MessagesGroupsPriorityQueue instance;
 
 	@BeforeMethod
 	public void setUp( ) {
-		instance = new FifoStrategy( );
+		instance = new MessagesGroupsPriorityQueue( );
 	}
 
 	@Test
@@ -30,8 +30,8 @@ public class FifoStrategyTest {
 		);
 		messages.stream( ).forEachOrdered( instance::enqueue );
 		assertEquals( instance.dequeue( ).getId( ), messages.get( 0 ).getId( ) );
-		assertEquals( instance.dequeue( ).getId( ), messages.get( 1 ).getId( ) );
 		assertEquals( instance.dequeue( ).getId( ), messages.get( 2 ).getId( ) );
+		assertEquals( instance.dequeue( ).getId( ), messages.get( 1 ).getId( ) );
 		assertEquals( instance.dequeue( ).getId( ), messages.get( 3 ).getId( ) );
 	}
 
@@ -65,7 +65,8 @@ public class FifoStrategyTest {
 		instance.cancel( "group2" );
 		assertEquals( instance.dequeue( ).getId( ), messages.get( 1 ).getId( ) );
 		assertEquals( instance.dequeue( ).getId( ), messages.get( 3 ).getId( ) );
-		assertTrue( instance.isQueueEmpty() );
+		assertTrue( instance.isQueueEmpty( ) );
 	}
+
 
 }

@@ -2,7 +2,7 @@ package org.mstream.exercise.scheduler;
 
 import org.mstream.exercise.scheduler.resource.Gateway;
 import org.mstream.exercise.scheduler.resource.Message;
-import org.mstream.exercise.scheduler.strategy.PrioritizationStrategy;
+import org.mstream.exercise.scheduler.strategy.QueuePrioritizationStrategy;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ResourceScheduler {
 
 	private final Gateway gateway;
-	private final PrioritizationStrategy prioritizationStrategy;
+	private final QueuePrioritizationStrategy queuePrioritizationStrategy;
 	private final Set terminatedGroups;
 	private final Set canceledGroups;
 
@@ -23,15 +23,15 @@ public class ResourceScheduler {
 
 	private int availableResources;
 
-	public ResourceScheduler( Gateway gateway, int resourcesNumber, PrioritizationStrategy prioritizationStrategy ) {
+	public ResourceScheduler( Gateway gateway, int resourcesNumber, QueuePrioritizationStrategy queuePrioritizationStrategy ) {
 		this.gateway = gateway;
-		this.prioritizationStrategy = prioritizationStrategy;
+		this.queuePrioritizationStrategy = queuePrioritizationStrategy;
 		this.terminatedGroups = new HashSet<>( );
 		this.canceledGroups = new HashSet<>( );
 		this.availableResources = resourcesNumber;
 	}
 
-	public void schedule( Message<?> message ) {
+	public void schedule( Message message ) {
 		terminationLock.lock( );
 		if ( message == null ) {
 			throw new IllegalArgumentException( "message can't be null" );
@@ -48,7 +48,7 @@ public class ResourceScheduler {
 		cancellationLock.unlock( );
 		Message wrappedMessage = new MessageWrapper<>( message );
 		queueLock.lock( );
-		prioritizationStrategy.enqueue( wrappedMessage );
+		queuePrioritizationStrategy.enqueue( wrappedMessage );
 		if ( availableResources > 0 ) {
 			sendNextToGateway( );
 			availableResources--;
@@ -65,7 +65,7 @@ public class ResourceScheduler {
 		cancellationLock.unlock( );
 	}
 
-	private void checkTermination( Message<?> message ) {
+	private void checkTermination( Message message ) {
 		if ( terminatedGroups.contains( message.getGroupId( ) ) ) {
 			throw new IllegalStateException( "can't schedule message from terminated group: " + message.getId( ) );
 		}
@@ -76,11 +76,11 @@ public class ResourceScheduler {
 
 	private void sendNextToGateway( ) {
 		assert anyPendingMessages( );
-		gateway.send( prioritizationStrategy.dequeue( ) );
+		gateway.send( queuePrioritizationStrategy.dequeue( ) );
 	}
 
 	private boolean anyPendingMessages( ) {
-		return !prioritizationStrategy.isQueueEmpty( );
+		return !queuePrioritizationStrategy.isQueueEmpty( );
 	}
 
 	private class MessageWrapper<T> implements Message<T> {

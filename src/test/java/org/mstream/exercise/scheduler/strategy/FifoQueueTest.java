@@ -7,17 +7,17 @@ import org.testng.annotations.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mstream.exercise.scheduler.mocks.MessageFixture.*;
+import static org.mstream.exercise.scheduler.mocks.MessageFixture.mockMessage;
 import static org.testng.Assert.*;
 
 
-public class MessagesGroupStrategyTest {
+public class FifoQueueTest {
 
-	private MessagesGroupStrategy instance;
+	private FifoQueue instance;
 
 	@BeforeMethod
 	public void setUp( ) {
-		instance = new MessagesGroupStrategy( );
+		instance = new FifoQueue( );
 	}
 
 	@Test
@@ -30,8 +30,8 @@ public class MessagesGroupStrategyTest {
 		);
 		messages.stream( ).forEachOrdered( instance::enqueue );
 		assertEquals( instance.dequeue( ).getId( ), messages.get( 0 ).getId( ) );
-		assertEquals( instance.dequeue( ).getId( ), messages.get( 2 ).getId( ) );
 		assertEquals( instance.dequeue( ).getId( ), messages.get( 1 ).getId( ) );
+		assertEquals( instance.dequeue( ).getId( ), messages.get( 2 ).getId( ) );
 		assertEquals( instance.dequeue( ).getId( ), messages.get( 3 ).getId( ) );
 	}
 
@@ -67,6 +67,5 @@ public class MessagesGroupStrategyTest {
 		assertEquals( instance.dequeue( ).getId( ), messages.get( 3 ).getId( ) );
 		assertTrue( instance.isQueueEmpty() );
 	}
-
 
 }

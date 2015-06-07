@@ -1,6 +1,6 @@
 package org.mstream.exercise.scheduler;
 
-import org.mstream.exercise.scheduler.mocks.FifoStrategy;
+import org.mstream.exercise.scheduler.mocks.FifoStrategyQueue;
 import org.mstream.exercise.scheduler.mocks.gateway.GatewayMock;
 import org.mstream.exercise.scheduler.mocks.gateway.NotEnoughOfAvailableResourcesException;
 import org.mstream.exercise.scheduler.resource.Message;
@@ -18,7 +18,7 @@ public class ResourceSchedulerTest {
 	@Test( expectedExceptions = { IllegalArgumentException.class } )
 	public void shouldThrowExceptionWhenNullMessageScheduled( ) throws Exception {
 		GatewayMock gatewayMock = new GatewayMock( 1 );
-		instance = new ResourceScheduler( gatewayMock, gatewayMock.getResourcesNumber( ), new FifoStrategy( ) );
+		instance = new ResourceScheduler( gatewayMock, gatewayMock.getResourcesNumber( ), new FifoStrategyQueue( ) );
 		try {
 			instance.schedule( null );
 		} catch ( NotEnoughOfAvailableResourcesException e ) {
@@ -29,7 +29,7 @@ public class ResourceSchedulerTest {
 	@Test
 	public void shouldForwardOneMessageToSingleResource( ) throws Exception {
 		GatewayMock gatewayMock = new GatewayMock( 1 );
-		instance = new ResourceScheduler( gatewayMock, gatewayMock.getResourcesNumber( ), new FifoStrategy( ) );
+		instance = new ResourceScheduler( gatewayMock, gatewayMock.getResourcesNumber( ), new FifoStrategyQueue( ) );
 		Message<String> message = mockMessage( "msg", "grp" );
 		try {
 			instance.schedule( message );
@@ -43,7 +43,7 @@ public class ResourceSchedulerTest {
 	@Test
 	public void shouldForwardTwoMessagesToTwoResources( ) throws Exception {
 		GatewayMock gatewayMock = new GatewayMock( 2 );
-		instance = new ResourceScheduler( gatewayMock, gatewayMock.getResourcesNumber( ), new FifoStrategy( ) );
+		instance = new ResourceScheduler( gatewayMock, gatewayMock.getResourcesNumber( ), new FifoStrategyQueue( ) );
 		Message<String> messageA = mockMessage( "msgA", "grp" );
 		Message<String> messageB = mockMessage( "msgB", "grp" );
 		try {
@@ -60,7 +60,7 @@ public class ResourceSchedulerTest {
 	@Test
 	public void shouldQueueOneMessageWhenTwoMessagesSentToSingleResource( ) throws Exception {
 		GatewayMock gatewayMock = new GatewayMock( 1 );
-		instance = new ResourceScheduler( gatewayMock, gatewayMock.getResourcesNumber( ), new FifoStrategy( ) );
+		instance = new ResourceScheduler( gatewayMock, gatewayMock.getResourcesNumber( ), new FifoStrategyQueue( ) );
 		Message<String> messageA = mockMessage( "msgA", "grp" );
 		Message<String> messageB = mockMessage( "msgB", "grp" );
 		try {
@@ -76,7 +76,7 @@ public class ResourceSchedulerTest {
 	@Test
 	public void shouldRespondWhenMessageProcessingCompletes( ) throws Exception {
 		GatewayMock gatewayMock = new GatewayMock( 1 );
-		instance = new ResourceScheduler( gatewayMock, gatewayMock.getResourcesNumber( ), new FifoStrategy( ) );
+		instance = new ResourceScheduler( gatewayMock, gatewayMock.getResourcesNumber( ), new FifoStrategyQueue( ) );
 		Message<String> messageA = mockMessage( "msgA", "grp" );
 		Message<String> messageB = mockMessage( "msgB", "grp" );
 		try {
@@ -93,7 +93,7 @@ public class ResourceSchedulerTest {
 	@Test( expectedExceptions = { IllegalStateException.class } )
 	public void shouldThrowExceptionWhenMessageFromTerminatedGroupSent( ) throws Exception {
 		GatewayMock gatewayMock = new GatewayMock( 1 );
-		instance = new ResourceScheduler( gatewayMock, gatewayMock.getResourcesNumber( ), new FifoStrategy( ) );
+		instance = new ResourceScheduler( gatewayMock, gatewayMock.getResourcesNumber( ), new FifoStrategyQueue( ) );
 		Message<String> terminatingMessage = mockTerminatingMessage( "msgA", "grp" );
 		Message<String> message = mockMessage( "msgB", "grp" );
 		try {
@@ -107,7 +107,7 @@ public class ResourceSchedulerTest {
 	@Test
 	public void shouldNotForwardFurtherMessagesFromCanceledGroup( ) throws Exception {
 		GatewayMock gatewayMock = new GatewayMock( 1 );
-		instance = new ResourceScheduler( gatewayMock, gatewayMock.getResourcesNumber( ), new FifoStrategy( ) );
+		instance = new ResourceScheduler( gatewayMock, gatewayMock.getResourcesNumber( ), new FifoStrategyQueue( ) );
 		Message<String> message = mockMessage( "msg", "grp" );
 		instance.cancel( "grp" );
 		try {

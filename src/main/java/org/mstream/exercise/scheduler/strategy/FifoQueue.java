@@ -1,18 +1,17 @@
-package org.mstream.exercise.scheduler.mocks;
+package org.mstream.exercise.scheduler.strategy;
 
 import org.mstream.exercise.scheduler.resource.Message;
-import org.mstream.exercise.scheduler.strategy.PrioritizationStrategy;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
 
-public class FifoStrategy implements PrioritizationStrategy {
+public class FifoQueue implements QueuePrioritizationStrategy {
 
 	private final Queue<Message> messageQueue = new LinkedList<>( );
 
-	@Override public void enqueue( Message<?> message ) {
+	@Override public void enqueue( Message message ) {
 		messageQueue.offer( message );
 	}
 

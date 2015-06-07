@@ -3,9 +3,9 @@ package org.mstream.exercise.scheduler.strategy;
 import org.mstream.exercise.scheduler.resource.Message;
 
 
-public interface PrioritizationStrategy {
+public interface QueuePrioritizationStrategy {
 
-	void enqueue( Message<?> message );
+	void enqueue( Message message );
 
 	Message dequeue( );
 

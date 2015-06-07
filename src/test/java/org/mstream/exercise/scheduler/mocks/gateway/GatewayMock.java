@@ -18,7 +18,7 @@ public class GatewayMock implements Gateway {
 		this.availableResources = resourcesNumber;
 	}
 
-	@Override public void send( Message<?> message ) throws NotEnoughOfAvailableResourcesException {
+	@Override public void send( Message message ) throws NotEnoughOfAvailableResourcesException {
 		if ( availableResources == 0 ) {
 			throw new NotEnoughOfAvailableResourcesException( );
 		}
