@@ -6,7 +6,9 @@ import org.mstream.exercise.scheduler.resource.Message;
 public interface PrioritizationStrategy {
 
 	void enqueue( Message<?> message );
-	Message dequeue();
+
+	Message dequeue( );
+
 	boolean isQueueEmpty( );
 
 }
